@@ -1,4 +1,4 @@
-Generic Tessarae Device Firmware
+Generic Tesserae Device Firmware
 ================================
 
 **WORK IN EARLY PROGRESS**
@@ -6,7 +6,7 @@ Generic Tessarae Device Firmware
 Overview
 --------
 
-This repository implements a [Tessarae](https://github.com/dmellok/tesserae)
+This repository implements a [Tesserae](https://github.com/dmellok/tesserae)
 client using CircuitPython.
 
 CircuitPython runs on as of today 655 boards. It also runs on a normal
