@@ -1,3 +1,6 @@
 [submodule "external/base-app"]
 	path = external/base-app
 	url = https://github.com/bablokb/circuitpython-base-app/
+[submodule "external/tesserae_api"]
+	path = external/tesserae_api
+	url = https://github.com/bablokb/circuitpython-tesserae
