@@ -34,13 +34,23 @@ and/or a suitable configuration.
 Installation
 ------------
 
-TBD
+See [PC/Laptop Install](./pc-install.md) for how to install this client
+on a Linux-PC.
+
+Installation on a MacOS-system will need a HAL-file for that platform.
+Guess: copying `external/base_app/base_app/hal/GENERIC_LINUX_PC.py` to
+`external/base_app/base_app/hal/OS_AGNOSTIC_BOARD.py` could already
+do the trick.
+
+See [CircuitPython Device Install](./mcu-install.md) for how to install
+this client on a MCU.
 
 
 Configuration
 -------------
 
-TBD
+Copy `src/settings_template.py` to `src/settings.py` and edit where
+appropriate.
 
 
 Examples
