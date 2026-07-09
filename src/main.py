@@ -73,7 +73,7 @@ class App(UIApplication):
       interval = self.data["sleep_time"]
     else:
       # application default run-interval
-      interval = getattr(app_config, "run_interval", 1)
+      interval = getattr(app_config, "run_interval", 60)
 
     while time.monotonic()-self._run_start < interval:
       if self.process_events():
