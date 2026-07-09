@@ -20,8 +20,7 @@ With a valid `src/settings.py`, starting the client needs:
 For a list of valid displays to emulate, see `src/settings_pygame.py`.
 
 
-Note: all software prereqs are also available for MacOS and Windows. In
-theory, the client should therefore also run on these platforms. What is
-missing are HAL (hardware-abstraction-layer) files for the given platforms.
-These files should be very similar to the existing HAL for Linux. Contributions
-are welcome!
+Note: all software prereqs are also available for MacOS and Windows.
+macOS is confirmed working — see [macOS Install](./mac-install.md); it
+reuses the Linux HAL and needs no platform-specific HAL file. Windows
+is untested but should be similar. Contributions are welcome!

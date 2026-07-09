@@ -11,7 +11,24 @@
 # ----------------------------------------------------------------------------
 
 import os
+import pygame
 from blinka_displayio_pygamedisplay import PyGameDisplay
+
+
+# --- pygame display that keeps the window alive on macOS   -------------------
+
+class TesseraePyGameDisplay(PyGameDisplay):
+  """ PyGameDisplay variant that pumps the full SDL event queue.
+
+  The base check_quit() only does a *filtered* pygame.event.get(), which
+  does not pump the underlying (Cocoa) event queue. On macOS a window whose
+  event queue is never pumped is never actually shown, so the app window
+  stays invisible. Pumping here makes the window appear and stay responsive.
+  """
+
+  def check_quit(self, delay=0.05):
+    pygame.event.pump()
+    return super().check_quit(delay=delay)
 
 # display-sizes
 
@@ -43,7 +60,7 @@ def _get_display(hal):
   Simulates color-depth or color-attributes according to display-type.
   """
 
-  display = PyGameDisplay(width=width,height=height,
+  display = TesseraePyGameDisplay(width=width,height=height,
                        caption=CAPTION,
                        auto_refresh=True,
                        refresh_on_pygame_events=True,
@@ -52,6 +69,13 @@ def _get_display(hal):
     display.color_depth = gamut[1]
   elif isinstance(gamut,str):
     setattr(display,gamut,True)
+
+  # pump the event queue a few times so the window is actually shown before
+  # the app blocks on its first (network) update; without this macOS may
+  # keep the freshly-created window hidden.
+  for _ in range(3):
+    pygame.event.pump()
+    pygame.display.flip()
   return display
 
 # hardware configuration   ---------------------------------------------------
