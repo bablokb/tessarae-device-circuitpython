@@ -103,10 +103,7 @@ class App(UIApplication):
 
   def _map_color(self):
     """ map display-attributes """
-    if self.is_pygame:
-      # override in app_config if needed
-      return "rgb24"
-    elif hasattr(self.display, "color_depth"):
+    if hasattr(self.display, "color_depth"):
       # this is a Busdisplay
       if self.display.color_depth == 24:
         return "rgb24"
