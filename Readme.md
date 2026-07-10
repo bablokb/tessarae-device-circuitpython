@@ -49,8 +49,26 @@ this client on a MCU.
 Configuration
 -------------
 
-Copy `src/settings_template.py` to `src/settings.py` and edit where
-appropriate.
+The central configuration file is `src/settings.py` which is not
+tracked by the repository. Copy the blueprint `src/settings_template.py`
+to `src/settings.py` and edit where appropriate.
+
+The file creates three `Settings`-objects:
+
+  - `secrets`: WLAN credentials (only needed for real hardware)
+  - `app_config`: application configuration
+  - `hw_config`: hardware configuration
+
+Use one of the examples in `contrib/` as a basis for the necessary
+hardware configuration. Either merge the example into your
+`settings.py`, or create `src/local`, copy the example to `src/local`
+and add an import statement to your `settings.py`:
+
+    from local.bla import hw_config
+
+Note that `src/local` is not tracked by git, these files are local to
+your clone. If you create a useful hardware-config file, copy it to
+`contrib/` and create a PR.
 
 
 Examples
