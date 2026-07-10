@@ -37,10 +37,10 @@ Installation
 See [PC/Laptop Install](./pc-install.md) for how to install this client
 on a Linux-PC.
 
-Installation on a MacOS-system will need a HAL-file for that platform.
-Guess: copying `external/base_app/base_app/hal/GENERIC_LINUX_PC.py` to
-`external/base_app/base_app/hal/OS_AGNOSTIC_BOARD.py` could already
-do the trick.
+See [macOS Install](./mac-install.md) for how to install this client
+on a Mac. No macOS-specific HAL is needed: forcing Blinka to identify
+as a generic Linux-PC lets the existing `GENERIC_LINUX_PC` HAL be
+reused unchanged.
 
 See [CircuitPython Device Install](./mcu-install.md) for how to install
 this client on a MCU.
