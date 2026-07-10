@@ -42,7 +42,8 @@ DISPLAY_TYPES = {
   "ii7.3_old":   (800, 480, "advanced_color_epaper"),
   "iframe5.7":   (600, 448, "advanced_color_epaper"),
   "badger2040w": (296, 128, None),
-  "sunton-2424": (240, 240, ("color_depth",16))
+  "sunton-2424": (240, 240, ("color_depth",16)),
+  "sharp400":    (400, 240, None),
   }
 
 disp_type = os.getenv("TESSERAE_DISPLAY", default="native")
