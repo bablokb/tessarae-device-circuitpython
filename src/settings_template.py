@@ -6,7 +6,7 @@
 # Author: Bernhard Bablok
 # License: GPL3
 #
-# Website: https://github.com/bablokb/circuitpython-base-app
+# Website: https://github.com/bablokb/tesserae-device-circuitpython
 # ----------------------------------------------------------------------------
 
 import os
