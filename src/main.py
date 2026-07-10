@@ -52,13 +52,13 @@ class App(UIApplication):
     super().__init__(*args, ** kwargs)
 
     # fill in attributes needed by data and ui-provider
+    self._token = self._get_token()
     self.data.update({
       "url":          app_config.url,
       "name":         getattr(app_config,"name", board.board_id),
       "device_id":    app_config.device_id,
-      "token":        self._get_token(),
+      "token":        self._token,
       "pairing_code": getattr(app_config,"pairing_code", None),
-      "magic":        getattr(app_config, "magic", 0x4201),
       "mac":          getattr(app_config,"mac", self.wifi.mac_address),
       "width":        self.display.width,
       "height":       self.display.height,
@@ -79,6 +79,12 @@ class App(UIApplication):
       if self.process_events():
         return
 
+  # --- run at end of run()   ------------------------------------------------
+
+  def run_end(self):
+    """ Hook to execute at end of run(): save token """
+    self._save_token()
+
   # --- get token   ----------------------------------------------------------
 
   def _get_token(self):
@@ -86,18 +92,42 @@ class App(UIApplication):
 
     if hasattr(app_config,"token"):
       # use hard coded token
+      self.msg("main: using hard-coded token")
       return app_config.token
+
+    self._magic = getattr(app_config, "magic", 0x4201)
+    self.msg(f"main: reading token from NVRAM with magic: {self._magic}")
+    buffer = self._impl.nvram_read(0, 3)
+    if not self._magic == int(buffer[:2].hex(),16):
+      # magic number does not match, invalidate token
+      self.msg("main: magic number does not match, no token read")
+      return None
     else:
-      try:
-        # use token from NVRAM (TODO: move to HAL)
-        import microcontroller
-        if self.data["magic"] == microcontroller.nvm[0:2]:
-          length = microcontroller.nvm[2]
-          return (microcontroller.nvm[3:length+3]).decode()
-        else:
-          return None
-      except:
-        return None
+      # read token with given length
+      return self._impl.nvram_read(3, buffer[2]).decode()
+
+  # --- get token   ----------------------------------------------------------
+
+  def _save_token(self):
+    """ save token
+
+    The token is saved in NVRAM as: magic-number,length,token. The magic-number
+    allows to verify that we don't read random garbage and it allows to
+    invalidate an old token.
+    """
+
+    if self.data["token"] == self._token:
+      # not a new token, no need to save anything
+      self.msg("main: not saving token (no change)")
+      return
+    self._token = self.data["token"]
+    token = bytes(self.data["token"],'utf-8')
+    buffer = bytearray(3 + len(token))
+    buffer[:2] = self._magic.to_bytes(2,'big')
+    buffer[2]  = len(token)
+    buffer[3:3+len(token)] = token
+    self.msg(f"saving '{buffer}' to NVRAM")
+    self._impl.nvram_write(0, buffer)
 
   # --- map display-attributes to gamut   ------------------------------------
 
