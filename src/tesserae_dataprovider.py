@@ -48,7 +48,7 @@ class DataProvider:
   def _create_api(self):
     """ create API interface """
     self.msg("creating API-interface")
-    if not self._wifi.radio:
+    if not self._wifi.radio.connected:
       self._wifi.connect()
 
     self._panel = Tesserae_ID(self._data["name"],
