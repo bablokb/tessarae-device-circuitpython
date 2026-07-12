@@ -140,7 +140,8 @@ class App(UIApplication):
       else:
         return "rgb16"
     else:
-      # this is an EPaperDisplay
+      # this is an EPaperDisplay or a SharpMemoryDisplay. In the latter case,
+      # none of the attributes exist and the logic defaults to "mono".
       for attr, value in [("grayscale", "gray"),
                           ("advanced_color_epaper", "acep_7colour"),
                           ("spectra6", "spectra_6")]:
