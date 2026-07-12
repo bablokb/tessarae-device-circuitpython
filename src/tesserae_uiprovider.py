@@ -54,7 +54,7 @@ class UIProvider:
     """ update data: callback for Application """
 
     if "dashboard" not in data:
-      return self._view
+      return None
 
     bitmap, palette = adafruit_imageload.load(
       io.BytesIO(data["dashboard"]),
