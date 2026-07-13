@@ -56,6 +56,9 @@ class UIProvider:
     if "dashboard" not in data:
       return None
 
+    gc.collect()
+    if hasattr(gc,"mem_free"):
+      self.msg(f"free memory before imageload: {gc.mem_free()}")
     bitmap, palette = adafruit_imageload.load(
       io.BytesIO(data["dashboard"]),
       bitmap=displayio.Bitmap,
