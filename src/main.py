@@ -62,6 +62,7 @@ class App(UIApplication):
       "mac":          getattr(app_config,"mac", self.wifi.mac_address),
       "width":        self.display.width,
       "height":       self.display.height,
+      "format":       getattr(app_config,"format", "bmp"),
       "gamut":        getattr(app_config, "gamut", self._map_color()),
       })
 

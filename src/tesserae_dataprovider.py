@@ -55,6 +55,7 @@ class DataProvider:
                               self._data["device_id"],
                               self._data["width"],
                               self._data["height"],
+                              self._data["format"],
                               self._data["gamut"],
                               self._data["mac"])
     self._api   = Tesserae_API(self._panel.id,
@@ -124,8 +125,11 @@ class DataProvider:
 
     # fetch dashboard data for 200 and non e-inks
     if code == 200 or (code == 304 and
-                       self._data["gamut"] not in ["rgb16", "rgb24"]):
+                       self._data["gamut"] in ["rgb16", "rgb24"]):
       self._data["dashboard"] = self._api.url_content()
+      self.msg(f"dashboard size: {len(self._data['dashboard'])}")
+    elif "dashboard" in self._data:
+      del self._data["dashboard"]
 
     # send status (with battery information)
     code, resp = self._api.status({"battery_mv": 1000*data["bat_level"]})
