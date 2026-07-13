@@ -22,9 +22,9 @@ HEIGHT     = 240
 
 # --- hardware-pins   --------------------------------------------------------
 
-SCK_PIN   = board.GP10
-MOSI_PIN  = board.GP11
-CS_PIN    = board.GP9
+SCK_PIN   = board.GP2
+MOSI_PIN  = board.GP3
+CS_PIN    = board.GP5
 LED_PIN   = board.LED
 
 # --- atexit processing   ----------------------------------------------------
@@ -43,7 +43,7 @@ def _get_display(hal):
   atexit.register(at_exit,spi)
 
   # For the 400x240 display (can only be operated at 2MHz)
-  framebuffer = sharpdisplay.SharpMemoryFramebuffer(bus,PIN_CS,WIDTH,HEIGHT)
+  framebuffer = sharpdisplay.SharpMemoryFramebuffer(spi,CS_PIN,WIDTH,HEIGHT)
   return framebufferio.FramebufferDisplay(framebuffer)
 
 # hardware configuration   ---------------------------------------------------
