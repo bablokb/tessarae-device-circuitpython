@@ -44,7 +44,7 @@ def _get_display(hal):
 
   # For the 400x240 display (can only be operated at 2MHz)
   framebuffer = sharpdisplay.SharpMemoryFramebuffer(spi,CS_PIN,WIDTH,HEIGHT)
-  return framebufferio.FramebufferDisplay(framebuffer)
+  return framebufferio.FramebufferDisplay(framebuffer, auto_refresh=False)
 
 # hardware configuration   ---------------------------------------------------
 
