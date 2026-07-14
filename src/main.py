@@ -133,21 +133,33 @@ class App(UIApplication):
   # --- map display-attributes to gamut   ------------------------------------
 
   def _map_color(self):
-    """ map display-attributes """
-    if hasattr(self.display, "color_depth"):
-      # this is a Busdisplay
-      if self.display.color_depth == 24:
-        return "rgb24"
+    """ map display-attributes.
+    Important Note: auto-detection is only guesswork. Set
+    app_config.gamut if this fails.
+    """
+    disp_type = str(type(self.display))
+    if "BusDisplay" in disp_type:
+      return "rgb16"
+    elif "SPD1656" in disp_type:
+      return "acep_7colour"
+    elif "Inky_673" in disp_type:
+      return "spectra_6"
+    elif "PyGameDisplay" in disp_type:
+      # this class exposes more attributes
+      if hasattr(self.display, "color_depth", False):
+        if self.display.color_depth == 24:
+          return "rgb24"
+        else:
+          return "rgb16"
       else:
-        return "rgb16"
+        for attr, value in [("grayscale", "gray"),
+                            ("advanced_color_epaper", "acep_7colour"),
+                            ("spectra6", "spectra_6")]:
+          if getattr(self.display, attr, False):
+            return value
+        return "mono"
     else:
-      # this is an EPaperDisplay or a SharpMemoryDisplay. In the latter case,
-      # none of the attributes exist and the logic defaults to "mono".
-      for attr, value in [("grayscale", "gray"),
-                          ("advanced_color_epaper", "acep_7colour"),
-                          ("spectra6", "spectra_6")]:
-        if getattr(self.display, attr, False):
-          return value
+      # fallback to mono
       return "mono"
 
 # --- main program   ----------------------------------------------------------
