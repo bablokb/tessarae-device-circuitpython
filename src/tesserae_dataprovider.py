@@ -127,7 +127,6 @@ class DataProvider:
     if code == 200 or (code == 304 and
                        self._data["gamut"] in ["rgb16", "rgb24"]):
       self._data["dashboard"] = self._api.url_content()
-      self.msg(f"dashboard size: {len(self._data['dashboard'])}")
     elif "dashboard" in self._data:
       del self._data["dashboard"]
 

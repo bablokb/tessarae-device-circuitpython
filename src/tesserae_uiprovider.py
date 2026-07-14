@@ -7,7 +7,6 @@
 # Website: https://github.com/bablokb/tesserae-devive-circuitpython
 # ----------------------------------------------------------------------------
 
-import io
 import gc
 import displayio
 import terminalio
@@ -60,10 +59,19 @@ class UIProvider:
     if hasattr(gc,"mem_free"):
       self.msg(f"free memory before imageload: {gc.mem_free()}")
     bitmap, palette = adafruit_imageload.load(
-      io.BytesIO(data["dashboard"]),
+      data["dashboard"],
       bitmap=displayio.Bitmap,
       palette=displayio.Palette,
       )
+
+    if hasattr(gc,"mem_free"):
+      self.msg(f"free memory after imageload: {gc.mem_free()}")
+    data["dashboard"].close()
+    del data["dashboard"]
+    gc.collect()
+    if hasattr(gc,"mem_free"):
+      self.msg(f"free memory after dashboard delete: {gc.mem_free()}")
+
     if len(self._view):
       self._view[0].bitmap = bitmap      # replace existing bitmap
       gc.collect()
