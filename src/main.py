@@ -152,7 +152,7 @@ class App(UIApplication):
         else:
           return "rgb16"
       else:
-        for attr, value in [("grayscale", "gray"),
+        for attr, value in [("grayscale", "gray_4"),
                             ("advanced_color_epaper", "acep_7colour"),
                             ("spectra6", "spectra_6")]:
           if getattr(self.display, attr, False):
