@@ -43,6 +43,7 @@ DISPLAY_TYPES = {
   "ii7.3":       (800, 480, "spectra6"),
   "iframe5.7":   (600, 448, "advanced_color_epaper"),
   "badger2040w": (296, 128, None),
+  "magtag":      (296, 128, "grayscale"),
   "sunton-2424": (240, 240, ("color_depth",16)),
   "sharp400":    (400, 240, None),
   }
