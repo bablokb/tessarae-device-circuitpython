@@ -40,6 +40,7 @@ DISPLAY_TYPES = {
   "ii5.7_old":   (600, 448, "advanced_color_epaper"),
   "ii5.7":       (600, 448, "spectra6"),
   "ii7.3_old":   (800, 480, "advanced_color_epaper"),
+  "ii7.3":       (800, 480, "spectra6"),
   "iframe5.7":   (600, 448, "advanced_color_epaper"),
   "badger2040w": (296, 128, None),
   "sunton-2424": (240, 240, ("color_depth",16)),
