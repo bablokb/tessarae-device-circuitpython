@@ -146,7 +146,7 @@ class App(UIApplication):
       return "spectra_6"
     elif "PyGameDisplay" in disp_type:
       # this class exposes more attributes
-      if hasattr(self.display, "color_depth", False):
+      if hasattr(self.display, "color_depth"):
         if self.display.color_depth == 24:
           return "rgb24"
         else:
