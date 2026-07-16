@@ -15,7 +15,7 @@ import time
 
 from settings import secrets, hw_config, app_config
 from tesserae_api import Tesserae_ID, Tesserae_API
-import imageloader
+import imageload
 
 # --- main data-provider class   ---------------------------------------------
 
@@ -75,7 +75,7 @@ class DataProvider:
     gc.collect()
     if hasattr(gc,"mem_free"):
       self.msg(f"free memory before imageload: {gc.mem_free()}")
-    bitmap, palette = imageloader.load(response)
+    bitmap, palette = imageload.load(response)
     if hasattr(gc,"mem_free"):
       self.msg(f"free memory after imageload: {gc.mem_free()}")
     return bitmap, palette

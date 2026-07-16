@@ -4,3 +4,6 @@
 [submodule "external/tesserae_api"]
 	path = external/tesserae_api
 	url = https://github.com/bablokb/circuitpython-tesserae
+[submodule "external/imageload"]
+	path = external/imageload
+	url = https://github.com/bablokb/circuitpython-imageload
