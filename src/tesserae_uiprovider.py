@@ -55,23 +55,7 @@ class UIProvider:
     if "dashboard" not in data:
       return None
 
-    gc.collect()
-    if hasattr(gc,"mem_free"):
-      self.msg(f"free memory before imageload: {gc.mem_free()}")
-    bitmap, palette = adafruit_imageload.load(
-      data["dashboard"],
-      bitmap=displayio.Bitmap,
-      palette=displayio.Palette,
-      )
-
-    if hasattr(gc,"mem_free"):
-      self.msg(f"free memory after imageload: {gc.mem_free()}")
-    data["dashboard"].close()
-    del data["dashboard"]
-    gc.collect()
-    if hasattr(gc,"mem_free"):
-      self.msg(f"free memory after dashboard delete: {gc.mem_free()}")
-
+    bitmap, palette = data["dashboard"]
     if len(self._view):
       self._view[0].bitmap = bitmap      # replace existing bitmap
       gc.collect()
@@ -114,7 +98,7 @@ class UIProvider:
 
     error_txt = label.Label(terminalio.FONT,
                             text=ex_txt,
-                            color=UI_PALETTE[COLOR.RED],
+                            color=UI_PALETTE[COLOR.WHITE],
                             line_spacing=1.2,
                             anchor_point=(0,0),
                             anchored_position=(0,0))

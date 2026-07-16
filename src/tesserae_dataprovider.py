@@ -10,10 +10,12 @@
 # Website: https://github.com/bablokb/tesserae-devive-circuitpython
 # ----------------------------------------------------------------------------
 
+import gc
 import time
 
 from settings import secrets, hw_config, app_config
 from tesserae_api import Tesserae_ID, Tesserae_API
+import imageloader
 
 # --- main data-provider class   ---------------------------------------------
 
@@ -63,6 +65,20 @@ class DataProvider:
                                self._wifi.requests,
                                token=self._data["token"],
                                debug=self._debug)
+
+  # --- create bitmap   ------------------------------------------------------
+
+  def _create_bitmap(self, response):
+    """ create a bitmap, palette from the response """
+    # TODO: reuse an existing bitmap
+
+    gc.collect()
+    if hasattr(gc,"mem_free"):
+      self.msg(f"free memory before imageload: {gc.mem_free()}")
+    bitmap, palette = imageloader.load(response)
+    if hasattr(gc,"mem_free"):
+      self.msg(f"free memory after imageload: {gc.mem_free()}")
+    return bitmap, palette
 
   # --- discovery helper   ---------------------------------------------------
 
@@ -126,9 +142,28 @@ class DataProvider:
     # fetch dashboard data for 200 and non e-inks
     if code == 200 or (code == 304 and
                        self._data["gamut"] in ["rgb16", "rgb24"]):
-      self._data["dashboard"] = self._api.url_content()
+      response = None
+      try:
+        response = self._api.url_content(response_only=True)
+        # adafruit_requests only supports a single request at a time,
+        # so process it now before we call /status. The response
+        # is closed automatically.
+        self._data["dashboard"] = self._create_bitmap(response)
+      except Exception as ex:
+        self.msg("failed to create bitmap from response")
+        self.msg(f"  Exception: {ex}")
+        raise
+      finally:
+        if response:
+          response = None
+
     elif "dashboard" in self._data:
       del self._data["dashboard"]
+
+    # cleanup and log memory state
+    gc.collect()
+    if hasattr(gc,"mem_free"):
+      self.msg(f"free memory after cleanup: {gc.mem_free()}")
 
     # send status (with battery information)
     code, resp = self._api.status({"battery_mv": 1000*data["bat_level"]})
