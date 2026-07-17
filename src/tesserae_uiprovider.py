@@ -55,6 +55,7 @@ class UIProvider:
     if "dashboard" not in data:
       return None
 
+    # palette could also be a ColorConverter
     bitmap, palette = data["dashboard"]
     if len(self._view):
       self._view[0].bitmap = bitmap      # replace existing bitmap
