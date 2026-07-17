@@ -37,20 +37,20 @@ Status
 
 This list is not a priority list.
 
-  [ ] Honor ETAG / 304 on e-ink displays
-  [ ] Support "on/off" or "on/deep-sleep" workflows for devices
-      running on batteries 
-  [ ] Support memory constrained systems by caching files on SD
-  [ ] Add example configurations for more hardware devices
-  [ ] Support buttons
-  [ ] Automated setup of PiOS based clients (using cloud-init)
-  [ ] Support touch displays
-  [ ] Client side scheduled wakeup and polling
-  [ ] Improve documentation
-  [X] Memory optimized download of dashboards 
-  [X] Application configuration
-  [X] Emulation of arbitrary displays using PyGame-Displayio
-  [X] Basic workflow for "always-on" devices is functional
+  - [ ] Honor ETAG / 304 on e-ink displays
+  - [ ] Support "on/off" or "on/deep-sleep" workflows for devices
+        running on batteries 
+  - [ ] Support memory constrained systems by caching files on SD
+  - [ ] Add example configurations for more hardware devices
+  - [ ] Support buttons
+  - [ ] Automated setup of PiOS based clients (using cloud-init)
+  - [ ] Support touch displays
+  - [ ] Client side scheduled wakeup and polling
+  - [ ] Improve documentation
+  - [X] Memory optimized download of dashboards 
+  - [X] Application configuration
+  - [X] Emulation of arbitrary displays using PyGame-Displayio
+  - [X] Basic workflow for "always-on" devices is functional
 
 
 Hardware Requirements
