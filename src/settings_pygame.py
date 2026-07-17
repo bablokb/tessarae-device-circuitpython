@@ -34,6 +34,7 @@ class TesseraePyGameDisplay(PyGameDisplay):
 
 DISPLAY_TYPES = {
   "native":      (900, 600, ("color_depth",24)),
+  "native600":   (600, 400, ("color_depth",16)),
   "what":        (400, 300, None),
   "ii4_old":     (640, 400, "advanced_color_epaper"),
   "ii4":         (600, 400, "spectra6"),
