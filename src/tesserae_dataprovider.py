@@ -75,7 +75,7 @@ class DataProvider:
     gc.collect()
     if hasattr(gc,"mem_free"):
       self.msg(f"free memory before imageload: {gc.mem_free()}")
-    bitmap, palette = imageload.load(response)
+    bitmap, palette = imageload.load(imageload.ResponseReader(response))
     if hasattr(gc,"mem_free"):
       self.msg(f"free memory after imageload: {gc.mem_free()}")
     return bitmap, palette
