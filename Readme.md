@@ -1,7 +1,8 @@
 Generic Tesserae Device Firmware
 ================================
 
-**WORK IN EARLY PROGRESS**
+**WORK IN PROGRESS, see [Status](#status "Status") below**
+
 
 Overview
 --------
@@ -27,8 +28,67 @@ electronics), while the configuration layer allows a given board to run
 with different displays.
 
 The core take away is: this client will not automagically run on any
-device. But to make it run, it is only necessary to create the HAL
-and/or a suitable configuration.
+device. But to make it run, it is only necessary to create a suitable
+configuration and maybe to create the necessary HAL.
+
+
+Status
+------
+
+This list is not a priority list.
+
+  [ ] Honor ETAG / 304 on e-ink displays
+  [ ] Support "on/off" or "on/deep-sleep" workflows for devices
+      running on batteries 
+  [ ] Support memory constrained systems by caching files on SD
+  [ ] Add example configurations for more hardware devices
+  [ ] Support buttons
+  [ ] Automated setup of PiOS based clients (using cloud-init)
+  [ ] Support touch displays
+  [ ] Client side scheduled wakeup and polling
+  [ ] Improve documentation
+  [X] Memory optimized download of dashboards 
+  [X] Application configuration
+  [X] Emulation of arbitrary displays using PyGame-Displayio
+  [X] Basic workflow for "always-on" devices is functional
+
+
+Hardware Requirements
+---------------------
+
+CircuitPython itself uses a fair amount of RAM. This limits the
+available memory for the operation of a client. The client mainly
+needs memory for the network stack and the bitmap that is drawn on the
+display.
+
+ESP32S2/ESP32S3 base systems with PSRAM are usually a better choice
+than other systems. E.g. the Inky-Frame 5.7 has a display with 600x448
+pixels and is driven by an embedded Pico-W. This combination cannot
+download the dashboard and update the display in one go. The second
+generation Inky-Frame 7.3 with a Pico2-W in contrast should work.
+
+Another aspect is support for deep-sleep. While the Inky-Frames
+support very low power states due to special hardware, other
+RP2xxx-devices use much more energy compared to ESP32xx
+systems. Mainline CircuitPython doesn't even have support for
+deep-sleep at all.
+
+
+Tested Devices
+--------------
+
+Successfully tested:
+
+  - **Pico-W with SharpMemory-Display (420x200)**
+  - **Inky-Impression 7.3** (Spectra6) with Pico2-W (with adapter)
+  - **Adafruit MagTag**
+  - **Blinka with PyGame-Displayio** on Linux
+  - **Blinka with PyGame-Displayio** on MacOS
+
+Failed devices:
+
+  - **Pimoroni Inky-Frame-5.7** (embedded Pico-W): MemoryError.
+    This device might work once caching on SD is implemented.
 
 
 Installation
