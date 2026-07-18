@@ -121,6 +121,13 @@ class App(UIApplication):
       # not a new token, no need to save anything
       self.msg("main: not saving token (no change)")
       return
+    elif self.data["token"] == None:
+      # dataprovider invalidated the token, clear magic-number
+      self.msg(f"token invalidated, clearing NVRAM")
+      self._impl.nvram_write(0, b'\x00\x00')
+      return
+
+    # write magic-number|length|token to NVRAM
     self._token = self.data["token"]
     token = bytes(self.data["token"],'utf-8')
     buffer = bytearray(3 + len(token))

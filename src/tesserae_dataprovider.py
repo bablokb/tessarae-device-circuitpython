@@ -139,6 +139,16 @@ class DataProvider:
     if resp:
       self.msg(resp)
 
+    if code not in [200, 204, 304, 401]:
+      raise RuntimeError(f"/frame: unexpected HTTP return code {code}")
+
+    # if token is invalid, delete and restart
+    if code == 401:
+      self.msg("invalid bearer token")
+      self._api.token = None
+      self._data["token"] = None
+      data["sleep_time"] = 1
+
     # fetch dashboard data for 200 and non e-inks
     if code == 200 or (code == 304 and
                        self._data["gamut"] in ["rgb16", "rgb24"]):
@@ -158,6 +168,7 @@ class DataProvider:
           response = None
 
     elif "dashboard" in self._data:
+      # this will prevent the ui_provider from updating
       del self._data["dashboard"]
 
     # cleanup and log memory state
@@ -165,13 +176,14 @@ class DataProvider:
     if hasattr(gc,"mem_free"):
       self.msg(f"free memory after cleanup: {gc.mem_free()}")
 
-    # send status (with battery information)
-    code, resp = self._api.status({"battery_mv": 1000*data["bat_level"]})
-    self.msg(f"api.status(): HTTP-code: {code}")
-    if code == 200:
-      self.msg(resp)
-      data["sleep_time"] = resp.get("next_poll_s",30)
-    else:
-      raise RuntimeError(f"unexpected HTTP return code {code}")
+    if code < 400:
+      # send status (with battery information)
+      code, resp = self._api.status({"battery_mv": 1000*data["bat_level"]})
+      self.msg(f"api.status(): HTTP-code: {code}")
+      if code == 200:
+        self.msg(resp)
+        data["sleep_time"] = resp.get("next_poll_s",30)
+      else:
+        raise RuntimeError(f"/status: unexpected HTTP return code {code}")
 
     return
