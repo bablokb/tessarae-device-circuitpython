@@ -64,7 +64,7 @@ class DataProvider:
                                self._data["url"],
                                self._wifi.requests,
                                token=self._data["token"],
-                               debug=self._debug)
+                               debug=getattr(app_config, "debug_api", False))
 
   # --- create bitmap   ------------------------------------------------------
 
