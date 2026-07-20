@@ -1,9 +1,9 @@
 # ----------------------------------------------------------------------------
 # settings_sharp400.py: Settings for a Sharp Memory Display.
 #
-# Merge with your settings.py or use:
+# Merge with your settings.py or copy to src/local, adapt and use:
 #
-#    from settings_sharp400 import hw_config
+#    from local.settings_sharp400 import hw_config
 #
 # Website: https://github.com/bablokb/tesserae-device-circuitpython
 # ----------------------------------------------------------------------------
@@ -54,6 +54,8 @@ class Settings:
 hw_config     = Settings()
 hw_config.LED = LED_PIN
 hw_config.DISPLAY = _get_display
+hw_config.gamut = "mono"
+hw_config.eink  = False
 
 # all optional!
 hw_config.led_blink_init = 0.1
