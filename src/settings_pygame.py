@@ -30,27 +30,33 @@ class TesseraePyGameDisplay(PyGameDisplay):
     pygame.event.pump()
     return super().check_quit(delay=delay)
 
-# display-sizes
+# display-sizes: tuple of (width,height,gamut)
 
 DISPLAY_TYPES = {
-  "native":      (900, 600, ("color_depth",24)),
-  "native600":   (600, 400, ("color_depth",16)),
-  "what":        (400, 300, None),
-  "ii4_old":     (640, 400, "advanced_color_epaper"),
-  "ii4":         (600, 400, "spectra6"),
-  "ii5.7_old":   (600, 448, "advanced_color_epaper"),
-  "ii5.7":       (600, 448, "spectra6"),
-  "ii7.3_old":   (800, 480, "advanced_color_epaper"),
-  "ii7.3":       (800, 480, "spectra6"),
-  "iframe5.7":   (600, 448, "advanced_color_epaper"),
-  "badger2040w": (296, 128, None),
-  "magtag":      (296, 128, "grayscale"),
-  "sunton-2424": (240, 240, ("color_depth",16)),
-  "sharp400":    (400, 240, None),
+  "native":      (900, 600, "rgb24"),
+  "native600":   (600, 400, "rgb16"),
+  "what":        (400, 300, "mono"),
+  "ii4_old":     (640, 400, "acep_7colour"),
+  "ii4":         (600, 400, "spectra_6"),
+  "ii5.7_old":   (600, 448, "acep_7colour"),
+  "ii5.7":       (600, 448, "spectra_6"),
+  "ii7.3_old":   (800, 480, "acep_7colour"),
+  "ii7.3":       (800, 480, "spectra_6"),
+  "iframe5.7":   (600, 448, "acep_7colour"),
+  "badger2040w": (296, 128, "mono"),
+  "magtag":      (296, 128, "gray_4"),
+  "sunton-2424": (240, 240, "rgb16"),
+  "sharp400":    (400, 240, "mono"),
   }
 
 disp_type = os.getenv("TESSERAE_DISPLAY", default="native")
-width, height, gamut  = DISPLAY_TYPES[disp_type]
+if disp_type in DISPLAY_TYPES:
+  width, height, gamut  = DISPLAY_TYPES[disp_type]
+else:
+  # try to parse disp_type
+  width, height, gamut = disp_type.split(',')
+  width = int(width)
+  height = int(height)
 
 CAPTION = "Tesserae-Client"
 
@@ -69,10 +75,6 @@ def _get_display(hal):
                        auto_refresh=True,
                        refresh_on_pygame_events=True,
                        native_frames_per_second=0.5)
-  if isinstance(gamut,tuple):
-    display.color_depth = gamut[1]
-  elif isinstance(gamut,str):
-    setattr(display,gamut,True)
 
   # pump the event queue a few times so the window is actually shown before
   # the app blocks on its first (network) update; without this macOS may
@@ -86,3 +88,5 @@ def _get_display(hal):
 
 hw_config = Settings()
 hw_config.DISPLAY = _get_display
+hw_config.gamut = gamut
+hw_config.eink  = False
