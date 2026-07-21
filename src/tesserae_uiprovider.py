@@ -14,7 +14,7 @@ import terminalio
 import adafruit_imageload
 from adafruit_display_text import label
 
-from settings import secrets, hw_config, app_config
+from settings import app_config
 from ui_settings import UI_PALETTE, COLOR
 
 # --- main data-provider class   ---------------------------------------------

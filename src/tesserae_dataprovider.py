@@ -13,7 +13,7 @@
 import gc
 import time
 
-from settings import secrets, hw_config, app_config
+from settings import app_config
 from tesserae_api import Tesserae_ID, Tesserae_API
 import imageload
 
