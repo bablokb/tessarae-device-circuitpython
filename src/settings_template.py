@@ -11,11 +11,20 @@
 
 import os
 import board
-if board.board_id == "GENERIC_LINUX_PC":
-  from settings_pygame import hw_config
 
 class Settings:
   pass
+
+# hardware configuration   ---------------------------------------------------
+
+if board.board_id == "GENERIC_LINUX_PC":
+  # this uses Blinka+PyGame on a normal Linux/macOS system
+  from settings_pygame import hw_config
+else:
+  # minimal (empty) hw_config for board with integrated display
+  hw_config = Settings()
+  hw_config.gamut = "mono" # rgb16, rgb24, acep_7colour, spectra_6, gray_4
+  hw_config.eink  = True   # True|False
 
 # network configuration (ignored for PC/laptops)   ---------------------------
 
@@ -23,22 +32,21 @@ secrets = Settings()
 secrets.ssid      = 'my-ssid'
 secrets.password  = 'my-secret-password'
 secrets.retry     = 2
-secrets.debugflag = False
-secrets.channel   = 6
-secrets.timeout   = 10
-secrets.net_update = False
+#secrets.debugflag = False
+#secrets.channel   = 6
+#secrets.timeout   = 10
 
 # app configuration   --------------------------------------------------------
 
 # generic
 app_config = Settings()
-app_config.debug        = True     # needed to print the token for now
+#app_config.debug        = False
 app_config.always_on    = True     # should be off when running on batteries
 app_config.with_rtc     = False    # needed for local scheduling
 
 # application specific
 app_config.url       = "http://tesserae.local:8765"
-#app_config.gamut    = "mono"      # overrides auto-detection
+#app_config.debug_api = False
 #app_config.pairing_code =         # untested
 #app_config.magic =                # invalidates a stored token
 
