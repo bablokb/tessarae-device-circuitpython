@@ -51,6 +51,11 @@ class App(UIApplication):
   def __init__(self,*args,**kwargs):
     super().__init__(*args, ** kwargs)
 
+    if not hasattr(self.hal, "gamut"):
+      raise ValueError("'gamut' not defined in hw_config")
+    if not hasattr(self.hal, "eink"):
+      raise ValueError("'eink' not defined in hw_config")
+
     # fill in attributes needed by data and ui-provider
     self._token = self._get_token()
     self.data.update({
@@ -63,7 +68,8 @@ class App(UIApplication):
       "width":        self.display.width,
       "height":       self.display.height,
       "format":       getattr(app_config,"format", "bmp"),
-      "gamut":        getattr(app_config, "gamut", self._map_color()),
+      "gamut":        self.hal.gamut,
+      "eink":         self.hal.eink,
       })
 
   # --- override idle-processing   --------------------------------------------
@@ -98,14 +104,14 @@ class App(UIApplication):
 
     self._magic = getattr(app_config, "magic", 0x4201)
     self.msg(f"main: reading token from NVRAM with magic: {self._magic}")
-    buffer = self._impl.nvram_read(0, 3)
+    buffer = self.hal.nvram_read(0, 3)
     if not self._magic == int(buffer[:2].hex(),16):
       # magic number does not match, invalidate token
       self.msg("main: magic number does not match, no token read")
       return None
     else:
       # read token with given length
-      return self._impl.nvram_read(3, buffer[2]).decode()
+      return self.hal.nvram_read(3, buffer[2]).decode()
 
   # --- get token   ----------------------------------------------------------
 
@@ -124,7 +130,7 @@ class App(UIApplication):
     elif self.data["token"] == None:
       # dataprovider invalidated the token, clear magic-number
       self.msg(f"token invalidated, clearing NVRAM")
-      self._impl.nvram_write(0, b'\x00\x00')
+      self.hal.nvram_write(0, b'\x00\x00')
       return
 
     # write magic-number|length|token to NVRAM
@@ -135,39 +141,7 @@ class App(UIApplication):
     buffer[2]  = len(token)
     buffer[3:3+len(token)] = token
     self.msg(f"saving '{buffer}' to NVRAM")
-    self._impl.nvram_write(0, buffer)
-
-  # --- map display-attributes to gamut   ------------------------------------
-
-  def _map_color(self):
-    """ map display-attributes.
-    Important Note: auto-detection is only guesswork. Set
-    app_config.gamut if this fails.
-    """
-    disp_type = str(type(self.display))
-    if "BusDisplay" in disp_type:
-      return "rgb16"
-    elif "SPD1656" in disp_type:
-      return "acep_7colour"
-    elif "Inky_673" in disp_type:
-      return "spectra_6"
-    elif "PyGameDisplay" in disp_type:
-      # this class exposes more attributes
-      if hasattr(self.display, "color_depth"):
-        if self.display.color_depth == 24:
-          return "rgb24"
-        else:
-          return "rgb16"
-      else:
-        for attr, value in [("grayscale", "gray_4"),
-                            ("advanced_color_epaper", "acep_7colour"),
-                            ("spectra6", "spectra_6")]:
-          if getattr(self.display, attr, False):
-            return value
-        return "mono"
-    else:
-      # fallback to mono
-      return "mono"
+    self.hal.nvram_write(0, buffer)
 
 # --- main program   ----------------------------------------------------------
 
