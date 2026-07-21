@@ -87,6 +87,6 @@ def _get_display(hal):
 # hardware configuration   ---------------------------------------------------
 
 hw_config = Settings()
-hw_config.DISPLAY = _get_display
+hw_config.get_display = _get_display
 hw_config.gamut = gamut
 hw_config.eink  = False
