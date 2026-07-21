@@ -11,7 +11,6 @@ Run the following commands to install the environment:
     . venv.tesserae.cp-client/bin/activate
     pip install blinka-displayio-pygamedisplay
     pip install adafruit-circuitpython-display-text
-    pip install adafruit-circuitpython-imageload
 
 With a valid `src/settings.py`, starting the client needs:
 

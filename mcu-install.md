@@ -13,7 +13,6 @@ MCU Installation
      the `lib`-directory of your device  
 
        - adafruit_display_text
-       - adafruit_imageload
        - adafruit_requests
        - a suitable driver library for your display (unless it is builtin)
        - additional libraries for your hardware setup

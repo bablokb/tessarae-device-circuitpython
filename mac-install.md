@@ -20,7 +20,6 @@ Tested on macOS (Apple Silicon) with Homebrew Python 3.14.
     . venv.tesserae.cp-client/bin/activate
     pip install blinka-displayio-pygamedisplay
     pip install adafruit-circuitpython-display-text
-    pip install adafruit-circuitpython-imageload
 
 
 2. Pin setuptools (Python 3.12+)
