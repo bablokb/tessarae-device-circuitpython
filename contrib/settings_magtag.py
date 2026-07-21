@@ -10,9 +10,9 @@
 
 # hardware configuration   ---------------------------------------------------
 
-hw_config = Settings()
-hw_config.gamut = "gray_4"
-hw_config.eink  = True
+#class Settings:
+#  pass
+#hw_config = Settings()
 
 # key-mappings
 #hw_config.key_on  = 15

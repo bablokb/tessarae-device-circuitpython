@@ -91,6 +91,7 @@ def _get_display(hal):
   else:
     raise ValueError("unsupported display")
   display.auto_refresh = False
+  display.root_group = None
   return display
 
 def _get_keypad(hal):
@@ -100,7 +101,7 @@ def _get_keypad(hal):
                      value_when_pressed=False,pull=True,
                      interval=0.1,max_events=4)
 
-hw_config.DISPLAY = _get_display
+hw_config.get_display = _get_display
 hw_config.get_keypad = _get_keypad
 hw_config.eink = True
 hw_config.gamut = "spectra_6" if _inky_type == 'e673' else "acep_7colour"

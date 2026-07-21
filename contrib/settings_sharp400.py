@@ -53,7 +53,7 @@ class Settings:
 
 hw_config     = Settings()
 hw_config.LED = LED_PIN
-hw_config.DISPLAY = _get_display
+hw_config.get_display = _get_display
 hw_config.gamut = "mono"
 hw_config.eink  = False
 
