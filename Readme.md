@@ -37,7 +37,6 @@ Status
 
 This list is not a priority list.
 
-  - [ ] Honor ETAG / 304 on e-ink displays
   - [ ] Support "on/off" or "on/deep-sleep" workflows for devices
         running on batteries 
   - [ ] Support memory constrained systems by caching files on SD
@@ -47,6 +46,7 @@ This list is not a priority list.
   - [ ] Support touch displays
   - [ ] Client side scheduled wakeup and polling
   - [ ] Improve documentation
+  - [X] Honor ETAG / 304 on e-ink displays
   - [X] Memory optimized download of dashboards 
   - [X] Application configuration
   - [X] Emulation of arbitrary displays using PyGame-Displayio
