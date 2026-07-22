@@ -11,7 +11,6 @@ import gc
 import displayio
 import terminalio
 
-import adafruit_imageload
 from adafruit_display_text import label
 
 from settings import app_config
@@ -52,7 +51,7 @@ class UIProvider:
   def update_ui(self,data):
     """ update data: callback for Application """
 
-    if "dashboard" not in data:
+    if not data["updated"]:
       return None
 
     # palette could also be a ColorConverter
