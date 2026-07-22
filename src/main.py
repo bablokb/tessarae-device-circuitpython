@@ -37,7 +37,6 @@ def wait_for_console(duration=5):
       time.sleep(1)
   except:
     pass
-  print(f"running on board {board.board_id}")
 
 # --- cleanup at exit   ------------------------------------------------------
 
@@ -56,13 +55,14 @@ class App(UIApplication):
     if not hasattr(self.hal, "eink"):
       raise ValueError("'eink' not defined in hw_config")
 
+    self._token = None
+    self._etag  = None
+
     # fill in attributes needed by data and ui-provider
-    self._token = self._get_token()
     self.data.update({
       "url":          app_config.url,
       "name":         getattr(app_config,"name", board.board_id),
       "device_id":    app_config.device_id,
-      "token":        self._token,
       "pairing_code": getattr(app_config,"pairing_code", None),
       "mac":          getattr(app_config,"mac", self.wifi.mac_address),
       "width":        self.display.width,
@@ -82,50 +82,92 @@ class App(UIApplication):
       # application default run-interval
       interval = getattr(app_config, "run_interval", 60)
 
+    self.msg(f"running idle for {interval}s")
     while time.monotonic()-self._run_start < interval:
       if self.process_events():
         return
+
+  # --- run at start of run()   ----------------------------------------------
+
+  def run_start(self):
+    """ Hook to execute at start of run() """
+
+    if self._token and self._etag:
+      self.msg("not reading NVRAM (have token and etag)")
+      # This happens when running in a loop, so don't update on 304.
+      self.data["304update"] = False
+      return
+
+    # This is POR, so read data ...
+    self._read_nvram()
+    # ... and force updates for normal displays or in case no etag exists
+    self.data.update({
+      "token":        self._token,
+      "etag":         self._etag,
+      "304update":    not self.hal.eink or not self._etag
+      })
 
   # --- run at end of run()   ------------------------------------------------
 
   def run_end(self):
     """ Hook to execute at end of run(): save token """
-    self._save_token()
+    self._write_nvram()
 
-  # --- get token   ----------------------------------------------------------
+  # --- read persisted data   ------------------------------------------------
 
-  def _get_token(self):
-    """ get token """
+  def _read_nvram(self):
+    """ get token and etag from NVRAM """
 
     if hasattr(app_config,"token"):
       # use hard coded token
-      self.msg("main: using hard-coded token")
-      return app_config.token
+      self.msg(f"using hard-coded token: {app_config.token}")
+      self._token = app_config.token
+    else:
+      self._token = None
 
     self._magic = getattr(app_config, "magic", 0x4201)
-    self.msg(f"main: reading token from NVRAM with magic: {self._magic}")
+    self.msg(f"reading data from NVRAM with magic: {self._magic}")
     buffer = self.hal.nvram_read(0, 3)
     if not self._magic == int(buffer[:2].hex(),16):
       # magic number does not match, invalidate token
-      self.msg("main: magic number does not match, no token read")
-      return None
+      self.msg("magic number does not match, no data read")
+      self._etag = None
+      return
+
+    # read token with given length
+    if not self._token:
+      # read token
+      self._token = self.hal.nvram_read(3, buffer[2]).decode()
+      self.msg(f"token read from NVRAM: {self._token}")
+    offset = 3 + buffer[2]
+    len_etag = self.hal.nvram_read(offset, 1)[0]
+    self.msg(f"{len_etag=}")
+    if len_etag:
+      try:
+        self._etag = self.hal.nvram_read(offset+1, len_etag).decode()
+        self.msg(f"etag read from NVRAM: {self._etag}")
+      except:
+        self._etag = None
+        self.msg("no valid etag in NVRAM")
     else:
-      # read token with given length
-      return self.hal.nvram_read(3, buffer[2]).decode()
+      self._etag = None
+      self.msg("no saved etag in NVRAM")
 
-  # --- get token   ----------------------------------------------------------
+  # --- persist token and etag   ---------------------------------------------
 
-  def _save_token(self):
-    """ save token
+  def _write_nvram(self):
+    """ save token and etag
 
-    The token is saved in NVRAM as: magic-number,length,token. The magic-number
-    allows to verify that we don't read random garbage and it allows to
-    invalidate an old token.
+    The data is saved in NVRAM as:
+      magic-number,length,token,length,etag
+    The magic-number allows to verify that we don't read  random garbage
+    and it allows to invalidate an old token.
     """
 
-    if self.data["token"] == self._token:
-      # not a new token, no need to save anything
-      self.msg("main: not saving token (no change)")
+    if (self.data["token"] == self._token and
+        self.data["etag"] == self._etag):
+      # no new data, nothing to save
+      self.msg("not saving data (no change)")
       return
     elif self.data["token"] == None:
       # dataprovider invalidated the token, clear magic-number
@@ -133,17 +175,23 @@ class App(UIApplication):
       self.hal.nvram_write(0, b'\x00\x00')
       return
 
-    # write magic-number|length|token to NVRAM
+    # write data to NVRAM
     self._token = self.data["token"]
+    self._etag  = self.data["etag"]
     token = bytes(self.data["token"],'utf-8')
-    buffer = bytearray(3 + len(token))
-    buffer[:2] = self._magic.to_bytes(2,'big')
-    buffer[2]  = len(token)
-    buffer[3:3+len(token)] = token
+    etag = bytes(self.data["etag"],'utf-8')
+    buffer = bytearray(4 + len(token) + len(etag))
+    offset = 0
+    buffer[offset:2] = self._magic.to_bytes(2,'big'); offset += 2
+    buffer[offset]  = len(token); offset += 1
+    buffer[offset:offset+len(token)] = token; offset += len(token)
+    buffer[offset]  = len(etag); offset += 1
+    if len(etag):
+      buffer[offset:offset+len(etag)] = etag
     self.msg(f"saving '{buffer}' to NVRAM")
     self.hal.nvram_write(0, buffer)
 
-# --- main program   ----------------------------------------------------------
+# --- main program   ---------------------------------------------------------
 
 if getattr(app_config,"debug",False):
   wait_for_console()
@@ -157,12 +205,12 @@ app = App(data_provider,ui_provider,
 atexit.register(at_exit,app)
 
 if getattr(app_config,"debug",False):
-  print(f"startup: {time.monotonic()-start:f}s")
+  app.msg(f"startup: {time.monotonic()-start:f}s")
 
 if not getattr(app_config,"always_on",False):
-  print(f"running once")
+  app.msg(f"running once")
   app.run_once()
 else:
-  print(f"runing endless")
+  app.msg(f"runing endless")
   while True:
     app.run()
