@@ -70,15 +70,19 @@ class DataProvider:
 
   def _create_bitmap(self, response):
     """ create a bitmap, palette from the response """
-    # TODO: reuse an existing bitmap
 
     gc.collect()
     if hasattr(gc,"mem_free"):
       self.msg(f"free memory before imageload: {gc.mem_free()}")
-    bitmap, palette = imageload.load(imageload.ResponseReader(response))
+    if "dashboard" in self._data:
+      bitmap = self._data["dashboard"][0]
+    else:
+      bitmap = None
+    self._data["dashboard"] = imageload.load(
+      imageload.ResponseReader(response), bitmap)
     if hasattr(gc,"mem_free"):
       self.msg(f"free memory after imageload: {gc.mem_free()}")
-    return bitmap, palette
+    return
 
   # --- discovery helper   ---------------------------------------------------
 
@@ -134,6 +138,8 @@ class DataProvider:
           return
 
     # at this point we should have a token (or the pairing code is invalid)
+    data["updated"] = False
+    self._api.etag = data["etag"]
     code, resp = self._api.frame()
     self.msg(f"api.frame(): HTTP-code: {code}")
     if resp:
@@ -149,16 +155,22 @@ class DataProvider:
       self._data["token"] = None
       data["sleep_time"] = 1
 
-    # fetch dashboard data for 200 and non e-inks
-    if code == 200 or (code == 304 and
-                       self._data["gamut"] in ["rgb16", "rgb24"]):
+    # save etag (will be persisted by the main application)
+    if code == 200:
+      self.msg(f"new etag: {self._api.etag}")
+      data["etag"] = self._api.etag
+
+    # fetch dashboard data for HTTP200 and if requested
+    if code == 200 or (code == 304 and data["304update"]):
+      self.msg(f"fetching dashboard for HTTP-code {code}")
       response = None
       try:
         response = self._api.url_content(response_only=True)
         # adafruit_requests only supports a single request at a time,
         # so process it now before we call /status. The response
         # is closed automatically.
-        self._data["dashboard"] = self._create_bitmap(response)
+        self._create_bitmap(response)
+        data["updated"] = True
       except Exception as ex:
         self.msg("failed to create bitmap from response")
         self.msg(f"  Exception: {ex}")
@@ -166,10 +178,6 @@ class DataProvider:
       finally:
         if response:
           response = None
-
-    elif "dashboard" in self._data:
-      # this will prevent the ui_provider from updating
-      del self._data["dashboard"]
 
     # cleanup and log memory state
     gc.collect()
