@@ -15,6 +15,7 @@
 import board
 import time
 import atexit
+import gc
 
 from settings import app_config
 from base_app.ui_application import UIApplication
@@ -70,6 +71,7 @@ class App(UIApplication):
       "format":       getattr(app_config,"format", "bmp"),
       "gamut":        self.hal.gamut,
       "eink":         self.hal.eink,
+      "dashboard":    self._alloc_bitmap(),
       })
 
   # --- override idle-processing   --------------------------------------------
@@ -179,7 +181,10 @@ class App(UIApplication):
     self._token = self.data["token"]
     self._etag  = self.data["etag"]
     token = bytes(self.data["token"],'utf-8')
-    etag = bytes(self.data["etag"],'utf-8')
+    if self._etag:
+      etag = bytes(self.data["etag"],'utf-8')
+    else:
+      etag = ""
     buffer = bytearray(4 + len(token) + len(etag))
     offset = 0
     buffer[offset:2] = self._magic.to_bytes(2,'big'); offset += 2
@@ -190,6 +195,35 @@ class App(UIApplication):
       buffer[offset:offset+len(etag)] = etag
     self.msg(f"saving '{buffer}' to NVRAM")
     self.hal.nvram_write(0, buffer)
+
+  # --- allocate a bitmap for the display   ----------------------------------
+
+  def _alloc_bitmap(self):
+    """ pre allocate a suitable bitmap """
+
+    from displayio import Bitmap
+    col_map = {
+      "mono":  2,
+      "gray_4": 4,
+      "bwr_3":  4,
+      "bwy_3":  4,
+      "spectra_6":  6,
+      "acep_7colour":  7,
+      "rgb16": 65535,
+      "rgb24": 65535,
+      }
+    self.msg(
+      "creating Bitmap for display with" +
+      f"{self.display.width}x{self.display.height}@{col_map[self.hal.gamut]}")
+    gc.collect()
+    if hasattr(gc,"mem_free"):
+      self.msg(f"free memory before Bitmap allocation: {gc.mem_free()}")
+    return (Bitmap(self.display.width,
+                             self.display.height,
+                             col_map[self.hal.gamut]),
+            None)
+    if hasattr(gc,"mem_free"):
+      self.msg(f"free memory after Bitmap allocation: {gc.mem_free()}")
 
 # --- main program   ---------------------------------------------------------
 
