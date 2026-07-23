@@ -51,7 +51,7 @@ class UIProvider:
   def update_ui(self,data):
     """ update data: callback for Application """
 
-    if not data["updated"]:
+    if not data.get("updated",False):
       return None
 
     # palette could also be a ColorConverter
