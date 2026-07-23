@@ -97,6 +97,7 @@ class DataProvider:
       self._data["token"] = self._api.token
       return 0
     else:
+      self.msg("waiting for admin registration")
       return resp.get("retry_after_s",30)
 
   # --- register helper   --------------------------------------------------
