@@ -54,15 +54,14 @@ printed.)
 4. Configure
 ------------
 
-Copy `src/settings_template.y` to `src/settings.py` and edit where
+Copy `src/settings_template.py` to `src/settings.py` and edit where
 appropriate (at minimum `app_config.url`).
 
 Note: the Linux HAL reads the MAC address from `/sys/class/net/`, which
-does not exist on macOS, so it reports `None`. If your server keys
-devices by MAC, set a fixed value in `settings.py` so registration is
-stable across runs:
-
-    app_config.mac = "02:00:00:ca:fe:01"
+does not exist on macOS, so it reports `None`. The template already
+assigns a fixed `app_config.mac` per emulated display type; if you add
+your own display type, set a fixed MAC there too so registration stays
+stable across runs.
 
 
 5. Run
