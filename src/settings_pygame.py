@@ -15,7 +15,7 @@ import pygame
 from blinka_displayio_pygamedisplay import PyGameDisplay
 
 
-# --- pygame display that keeps the window alive on macOS   -------------------
+# --- pygame display that keeps the window alive on macOS   ------------------
 
 class TesseraePyGameDisplay(PyGameDisplay):
   """ PyGameDisplay variant that pumps the full SDL event queue.
@@ -33,6 +33,7 @@ class TesseraePyGameDisplay(PyGameDisplay):
 # display-sizes: tuple of (width,height,gamut)
 
 DISPLAY_TYPES = {
+  "fullscreen":  (  0,   0, "rgb16"),
   "native":      (900, 600, "rgb24"),
   "native600":   (600, 400, "rgb16"),
   "what":        (400, 300, "mono"),
@@ -58,12 +59,17 @@ else:
   width = int(width)
   height = int(height)
 
+if width == 0 and height == 0:
+  flags = pygame.FULLSCREEN
+else:
+  flags = 0
+
 CAPTION = "Tesserae-Client"
 
 class Settings:
   pass
 
-# --- helper-function for HAL   -----------------------------------------------
+# --- helper-function for HAL   ----------------------------------------------
 
 def _get_display(hal):
   """ create display for pygame
@@ -71,10 +77,11 @@ def _get_display(hal):
   """
 
   display = TesseraePyGameDisplay(width=width,height=height,
-                       caption=CAPTION,
-                       auto_refresh=True,
-                       refresh_on_pygame_events=True,
-                       native_frames_per_second=0.5)
+                                  flags=flags,
+                                  caption=CAPTION,
+                                  auto_refresh=True,
+                                  refresh_on_pygame_events=True,
+                                  native_frames_per_second=0.5)
 
   # pump the event queue a few times so the window is actually shown before
   # the app blocks on its first (network) update; without this macOS may
