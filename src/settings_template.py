@@ -17,8 +17,9 @@ class Settings:
 
 # hardware configuration   ---------------------------------------------------
 
-if board.board_id == "GENERIC_LINUX_PC":
-  # this uses Blinka+PyGame on a normal Linux/macOS system
+if (board.board_id == "GENERIC_LINUX_PC" or
+    board.board_id.startswith("RASPBERRY_PI")):
+  # this uses Blinka+PyGame on a normal Linux/macOS/Pi system
   from settings_pygame import hw_config
 else:
   # minimal (empty) hw_config for board with integrated display
