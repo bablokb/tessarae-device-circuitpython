@@ -94,6 +94,15 @@ Failed devices:
 Installation
 ------------
 
+This repository uses submodules, so you either need to clone with
+
+    git clone --recurse-submodules https://github.com/bablokb/tesserae-device-circuitpython
+
+or update the submodules after a normal clone:
+
+    git clone https://github.com/bablokb/tesserae-device-circuitpython
+    git submodule update --init --recursive
+
 See [PC/Laptop Install](./pc-install.md) for how to install this client
 on a Linux-PC.
 
